@@ -4,12 +4,12 @@ import { TApiSchema, IParameters, IRecurcive } from './types'
 
 export class ApiBuilder {
   static domains: Record<string, string> = {}
-  static axios: any
+  static http: any
 
   api: IRecurcive<Function>
 
-  static setAxios(axios: any) {
-    this.axios = axios
+  static setHttpClient(http: any) {
+    this.http = http
     return ApiBuilder
   }
 
@@ -43,7 +43,7 @@ export class ApiBuilder {
         params
       )
 
-      return ApiBuilder.axios[method]
+      return ApiBuilder.http[method]
         .apply(null, query.hasPayload ? [url, payload, config] : [url, config])
         .then(handler)
     }

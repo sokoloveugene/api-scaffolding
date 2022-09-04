@@ -9,7 +9,7 @@ const domains = {
   api_v2: 'http://localhost:8000',
 }
 
-const api = ApiBuilder.setAxios(axios)
+const api = ApiBuilder.setHttpClient(axios)
   .setDomains(domains)
   .from<IRootService>(schema)
 
