@@ -75,10 +75,11 @@ class ApiInterfaceBuilder {
   }
 }
 
-const parsePath = () => {
+const parseArgs = () => {
   const input = process.argv[3]
   const output = process.argv[5]
-
+  const isWatch = process.argv[6] === '--watch'
+  
   if (!input || !output) {
     throw new Error('Run command with correct arguments')
   }
@@ -86,20 +87,20 @@ const parsePath = () => {
   return {
     input: path.join(process.cwd(), input),
     output: path.join(process.cwd(), output),
+    isWatch,
   }
 }
 
 const prettier = (filePath: string) => {
   exec(`prettier --write ${filePath}`, (error) => {
     if (error) {
-      process.exit(1)
+      console.log('prettier format error')
     }
   })
 }
 
-const generate = () => {
-  const { input, output } = parsePath()
-
+const generateTypes = (input: string, output: string) => {
+  delete require.cache[require.resolve(input)]
   const { schema } = require(input)
 
   const interfaces = new ApiInterfaceBuilder(schema)
@@ -109,4 +110,10 @@ const generate = () => {
   prettier(output)
 }
 
-generate()
+const { input, output, isWatch } = parseArgs()
+
+generateTypes(input, output)
+
+if (isWatch) {
+  fs.watchFile(input, { interval: 5000 }, () => generateTypes(input, output))
+}
