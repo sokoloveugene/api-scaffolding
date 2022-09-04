@@ -1,3 +1,18 @@
+Run the CLI tool to scan your API-schema for TS interfaces.
+
+```bash
+  npx ts-node generate -i ./example/api.schema.ts -o ./example/output.ts --watch
+```
+
+Make sure input file has exported schema
+
+```typescript
+export const schema = {...}
+```
+
+#### Usage
+---
+
 ```typescript
 /**
  * Example with axios as http client

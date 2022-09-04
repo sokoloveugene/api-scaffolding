@@ -4,8 +4,8 @@
   "description": "",
   "main": "api-builder.js",
   "scripts": {
-    "types": "npx ts-node ./src/interface.builder.ts -i ./example/api.schema.ts -o ./example/output.ts",
-    "types:watch": "npx ts-node ./src/interface.builder.ts -i ./example/api.schema.ts -o ./example/output.ts --watch"
+    "types": "npx ts-node generate -i ./example/api.schema.ts -o ./example/output.ts",
+    "types:watch": "npx ts-node generate -i ./example/api.schema.ts -o ./example/output.ts --watch"
   },
   "author": "",
   "license": "ISC",
