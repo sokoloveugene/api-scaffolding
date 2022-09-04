@@ -1,0 +1,16 @@
+{
+  "name": "api-scaffolding",
+  "version": "1.0.0",
+  "description": "",
+  "main": "api-builder.js",
+  "scripts": {
+    "types": "npx ts-node ./src/interface.builder.ts -i ./example/api.schema.ts -o ./example/output.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^18.7.14",
+    "prettier": "2.7.1",
+    "typescript": "^4.8.2"
+  }
+}
