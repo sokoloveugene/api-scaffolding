@@ -1,6 +1,6 @@
-import { isQuery, TQuery } from './query'
+import { isQuery } from './query'
 import { compose } from './helpers'
-import { TApiSchema, IParameters, IRecurcive, IHttpClient } from './types'
+import { TApiSchema, IRecurcive, IHttpClient, TQuery } from './types'
 
 export class ApiBuilder {
   static domains: Record<string, string> = {}
@@ -54,7 +54,7 @@ export class ApiBuilder {
     }
   }
 
-  preprocess(query: TQuery, parameters: IParameters = {}) {
+  preprocess(query: TQuery, parameters: Record<string, unknown> = {}) {
     return {
       method: query.method,
       url: query.url.replace(/{{(.*?)}}/g, (match, $1) => {

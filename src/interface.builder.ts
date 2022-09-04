@@ -1,6 +1,6 @@
-import { isQuery, TQuery } from './query'
+import { isQuery } from './query'
 import { capitalize } from './helpers'
-import { TApiSchema } from './types'
+import { TApiSchema, TQuery } from './types'
 
 export class ApiInterfaceBuilder {
   generatedInterfaces: Set<string>
@@ -47,8 +47,8 @@ export class ApiInterfaceBuilder {
 
     parts.push(`config?: any,`)
 
-    parts.push(`})`)
-    return parts.join('\n').concat(`: ${this.returnType}`)
+    parts.push(`}): Promise<R>`)
+    return parts.join('')
   }
 
   getArgumentList(template: string) {
@@ -61,10 +61,6 @@ export class ApiInterfaceBuilder {
   getInterfaceName(serviceName: string) {
     const base = `I${capitalize(serviceName)}`
     return base.endsWith('Service') ? base : `${base}Service`
-  }
-
-  get returnType() {
-    return `Promise<R>;` as const
   }
 
   get serialized() {

@@ -1,13 +1,9 @@
-import { TQuery } from './query'
-
-export interface IRecurcive<T> {
-  [key: string]: T | Record<string, T> | IRecurcive<T>
-}
-
-export type TApiSchema = IRecurcive<TQuery>
-
-export interface IParameters {
-  [key: string]: unknown
+export enum EMethod {
+  GET = 'get',
+  DELETE = 'delete',
+  POST = 'post',
+  PUT = 'put',
+  PATCH = 'patch',
 }
 
 export interface IHttpClient<Config = unknown> {
@@ -17,3 +13,17 @@ export interface IHttpClient<Config = unknown> {
   put<R = any, D = any>(url: string, payload?: D, config?: Config): Promise<R>
   patch<R = any, D = any>(url: string, payload?: D, config?: Config): Promise<R>
 }
+
+export type TQuery = {
+  type: '__query__'
+  hasPayload: boolean
+  method: EMethod
+  url: string
+  handlers: Function[]
+}
+
+export interface IRecurcive<T> {
+  [key: string]: T | Record<string, T> | IRecurcive<T>
+}
+
+export type TApiSchema = IRecurcive<TQuery>

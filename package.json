@@ -5,7 +5,8 @@
   "main": "api-builder.js",
   "scripts": {
     "types": "npx ts-node generate -i ./example/api.schema.ts -o ./example/output.ts",
-    "types:watch": "npx ts-node generate -i ./example/api.schema.ts -o ./example/output.ts --watch"
+    "types:watch": "npx ts-node generate -i ./example/api.schema.ts -o ./example/output.ts --watch",
+    "example": "npx ts-node ./example"
   },
   "author": "",
   "license": "ISC",

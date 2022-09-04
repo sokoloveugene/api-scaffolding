@@ -1,18 +1,11 @@
-enum EMethod {
-  GET = 'get',
-  DELETE = 'delete',
-  POST = 'post',
-  PUT = 'put',
-  PATCH = 'patch',
-}
-
+import { EMethod, TQuery } from './types'
 const TYPE = '__query__' as const
 
 const query = (
   method: EMethod,
   [template]: TemplateStringsArray,
   ...handlers: Function[]
-) => {
+): TQuery => {
   const [url] = template.split(/\s+/)
 
   return {
@@ -30,7 +23,6 @@ export const PUT = query.bind(null, EMethod.PUT)
 export const PATCH = query.bind(null, EMethod.PATCH)
 export const DELETE = query.bind(null, EMethod.DELETE)
 
-export type TQuery = ReturnType<typeof query>
 export const isQuery = (val: unknown): val is TQuery => {
   // @ts-ignore
   return Boolean(val) && typeof val === 'object' && val['type'] === TYPE
