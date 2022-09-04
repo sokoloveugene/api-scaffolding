@@ -1,22 +1,23 @@
 import { isQuery, TQuery } from './query'
 import { compose } from './helpers'
-import { TApiSchema, IParameters, IRecurcive } from './types'
+import { TApiSchema, IParameters, IRecurcive, IHttpClient } from './types'
 
 export class ApiBuilder {
   static domains: Record<string, string> = {}
-  static http: any
-
-  api: IRecurcive<Function>
-
-  static setHttpClient(http: any) {
-    this.http = http
-    return ApiBuilder
-  }
 
   static setDomains(map: Record<string, string>) {
     this.domains = map
     return ApiBuilder
   }
+
+  static http: IHttpClient
+
+  static setHttpClient<Config = unknown>(http: IHttpClient<Config>) {
+    ApiBuilder.http = http
+    return ApiBuilder
+  }
+
+  api: IRecurcive<Function>
 
   static from<Generated = any>(schema: TApiSchema): Generated {
     return new ApiBuilder(schema) as unknown as Generated
@@ -44,7 +45,11 @@ export class ApiBuilder {
       )
 
       return ApiBuilder.http[method]
-        .apply(null, query.hasPayload ? [url, payload, config] : [url, config])
+        .apply(
+          null,
+          // @ts-ignore
+          query.hasPayload ? [url, payload, config] : [url, config]
+        )
         .then(handler)
     }
   }

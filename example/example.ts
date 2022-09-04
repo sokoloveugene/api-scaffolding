@@ -9,6 +9,7 @@ const domains = {
   api_v2: 'http://localhost:8000',
 }
 
+// @ts-ignore
 const api = ApiBuilder.setHttpClient(axios)
   .setDomains(domains)
   .from<IRootService>(schema)
@@ -27,7 +28,6 @@ api.client.get({
   config: { headers: { 'X-Requested-With': 'XMLHttpRequest' } },
 })
 
-// AXIOS patch on, http://localhost:8000/customer/123?primary=true with {"age":18,"hobby":"Java"}
 api.client.update({
   id: 123,
   isPrimary: true,
