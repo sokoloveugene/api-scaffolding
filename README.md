@@ -1,7 +1,15 @@
+#### Instalation
+
+```
+npm install api-scaffolding
+```
+
+#### Types generation
+
 Run the CLI tool to scan your API-schema for TS interfaces.
 
 ```bash
-  npx ts-node generate -i ./example/api.schema.ts -o ./example/output.ts --watch
+npx api-scaffolding-types -i example.ts -o types.ts --watch
 ```
 
 Make sure input file has exported schema
@@ -11,7 +19,6 @@ export const schema = {...}
 ```
 
 #### Usage
----
 
 ```typescript
 /**
@@ -75,5 +82,3 @@ const example = async () => {
   })
 }
 ```
-
-![Screenshot 2022-09-04 at 13.28.41](/assets/Screenshot%202022-09-04%20at%2013.28.41.png)
