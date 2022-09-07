@@ -26,4 +26,4 @@ export interface IRecurcive<T> {
   [key: string]: T | Record<string, T> | IRecurcive<T>
 }
 
-export type TApiSchema = IRecurcive<TQuery>
+export type ApiSchema = IRecurcive<TQuery>

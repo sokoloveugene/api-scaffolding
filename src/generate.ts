@@ -1,7 +1,11 @@
+#! /usr/bin/env node
 import fs from 'fs'
+import vm from 'vm'
 import path from 'path'
 import { exec } from 'child_process'
-import { ApiInterfaceBuilder } from './src/interface.builder'
+import { ApiInterfaceBuilder } from './interface.builder'
+
+console.log('START')
 
 const parseArgs = () => {
   const input = process.argv[3]
@@ -27,6 +31,7 @@ const generateTypes = () => {
 
   const interfaces = new ApiInterfaceBuilder(schema)
 
+  console.log('generating...')
   fs.writeFileSync(output, interfaces.serialized, 'utf8')
 
   exec(`prettier --write ${output}`, (error) => {

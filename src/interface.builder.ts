@@ -1,16 +1,16 @@
 import { isQuery } from './query'
 import { capitalize } from './helpers'
-import { TApiSchema, TQuery } from './types'
+import { ApiSchema, TQuery } from './types'
 
 export class ApiInterfaceBuilder {
   generatedInterfaces: Set<string>
 
-  constructor(schema: TApiSchema) {
+  constructor(schema: ApiSchema) {
     this.generatedInterfaces = new Set()
     this.getInterface('RootService', schema)
   }
 
-  getInterface(name: string, schema: TApiSchema) {
+  getInterface(name: string, schema: ApiSchema) {
     const parts = []
 
     parts.push(`export interface ${this.getInterfaceName(name)} {`)

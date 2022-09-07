@@ -1,12 +1,12 @@
 import { GET, POST, PUT, PATCH, DELETE } from '../src/query'
-import { TApiSchema } from '../src/types'
+import { ApiSchema } from '../src/types'
 
 const Fn = {
   json: (res: unknown) => `${res} DECORATED TO JSON`,
   log: (data: unknown) => (console.log(data), data),
 }
 
-export const schema: TApiSchema = {
+export const schema: ApiSchema = {
   heartbeat: GET`{{api_v2}}/heartbeat => ${Fn.json} ${Fn.log}`,
   client: {
     get: GET`{{api_v1}}/customer/{{id:number}} => ${Fn.json} ${Fn.log}`,
