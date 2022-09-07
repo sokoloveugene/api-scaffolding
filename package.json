@@ -1,6 +1,6 @@
 {
   "name": "api-scaffolding",
-  "version": "0.0.2",
+  "version": "0.0.5",
   "description": "Generate API functions with types using schema",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,5 +17,9 @@
     "@types/node": "^18.7.14",
     "prettier": "2.7.1",
     "typescript": "^4.8.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sokoloveugene/api-scaffolding"
   }
 }
