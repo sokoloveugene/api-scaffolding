@@ -1,15 +1,14 @@
 {
   "name": "api-scaffolding",
-  "version": "1.0.0",
-  "description": "",
-  "main": "api-builder.js",
+  "version": "0.0.1",
+  "description": "Generate API functions with types using schema",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
   "scripts": {
-    "types": "npx ts-node generate -i ./example/api.schema.ts -o ./example/output.ts",
-    "types:watch": "npx ts-node generate -i ./example/api.schema.ts -o ./example/output.ts --watch",
-    "example": "npx ts-node ./example"
+    "build": "npx tsc"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Sokolov Yevhenii",
   "devDependencies": {
     "@types/node": "^18.7.14",
     "prettier": "2.7.1",
