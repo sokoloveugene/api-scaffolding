@@ -1,11 +1,20 @@
-#! /usr/bin/env node
+#! /usr/bin/env npx ts-node
 import fs from 'fs'
-import vm from 'vm'
 import path from 'path'
 import { exec } from 'child_process'
 import { ApiInterfaceBuilder } from './interface.builder'
 
-console.log('START')
+const COLORS = {
+  info: '\x1b[33m%s\x1b[0m',
+  error: '\x1b[31m',
+}
+
+const logger = (type: keyof typeof COLORS = 'info', message: string) => {
+  console.log(COLORS[type], message)
+}
+
+const info = (message: string) => logger('info', message)
+const error = (message: string) => logger('error', message)
 
 const parseArgs = () => {
   const input = process.argv[3]
@@ -13,7 +22,8 @@ const parseArgs = () => {
   const isWatch = process.argv[6] === '--watch'
 
   if (!input || !output) {
-    throw new Error('Run command with correct arguments')
+    error('input and output arguments are not valid')
+    process.exit(1)
   }
 
   return {
@@ -25,18 +35,23 @@ const parseArgs = () => {
 
 const { input, output, isWatch } = parseArgs()
 
+info(`Script started ${isWatch ? 'in watch mode' : ''}`)
+
 const generateTypes = () => {
   delete require.cache[require.resolve(input)]
+  info('Start loading schema from ' + input)
   const { schema } = require(input)
 
+  info('Generate interfaces')
   const interfaces = new ApiInterfaceBuilder(schema)
 
-  console.log('generating...')
+  info('Write to file ' + output)
   fs.writeFileSync(output, interfaces.serialized, 'utf8')
 
-  exec(`prettier --write ${output}`, (error) => {
-    if (error) {
-      console.log('prettier format error')
+  info('Format with prettier')
+  exec(`prettier --write ${output}`, (err) => {
+    if (err) {
+      error('Prettier format error')
     }
   })
 }
