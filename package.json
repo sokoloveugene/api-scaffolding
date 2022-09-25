@@ -1,20 +1,25 @@
 {
   "name": "api-scaffolding",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Generate API functions with types using schema",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "bin": {
     "api-scaffolding-types": "dist/generate.js"
   },
   "scripts": {
-    "build": "npx tsc",
-    "types": "npx ts-node generate -i ./example/api.schema.ts -o ./example/output.ts"
+    "build:lib": "esbuild src/index.ts --bundle --minify --outdir=dist",
+    "build:generator": "esbuild src/generate.ts --bundle --minify --platform=node --outdir=dist",
+    "build": "npm run build:lib && npm run build:generator",
+    "postbuild": "tsc --emitDeclarationOnly"
   },
   "author": "Sokolov Yevhenii",
   "devDependencies": {
     "@types/node": "^18.7.14",
+    "esbuild": "^0.15.9",
     "prettier": "2.7.1",
     "typescript": "^4.8.2"
   },
