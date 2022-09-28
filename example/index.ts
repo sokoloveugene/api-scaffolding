@@ -1,43 +1,62 @@
-import { ApiBuilder } from '../src/api.builder'
-import { schema } from './api.schema'
-import { axios } from './axios'
-// Generate interfaces npm run types
-import { IRootService } from './output'
+import axios from "axios";
+import { IRootService } from "./types";
+import { ApiBuilder } from "api-scaffolding";
+import { schema } from "./schema";
 
 const domains = {
-  api_v1: 'http://localhost:4200/api',
-  api_v2: 'http://localhost:8000',
-}
+  api: "https://jsonplaceholder.typicode.com",
+};
 
-// @ts-ignore
 const api = ApiBuilder.setHttpClient(axios)
   .setDomains(domains)
-  .from<IRootService>(schema)
+  .from<IRootService>(schema);
 
-api.heartbeat()
+interface Post {
+  id: number;
+  title: string;
+  body: string;
+  userId: number;
+}
 
-api.client.update<any, { test: boolean }>({
-  id: 12,
-  isPrimary: true,
-  payload: { test: true },
-})
+(async () => {
+  await api.post.getById({ postId: 1 });
 
-// AXIOS get on, http://localhost:4200/api/customer/123 DECORATED TO JSON
-api.client.get({
-  id: 123,
-  config: { headers: { 'X-Requested-With': 'XMLHttpRequest' } },
-})
+  await api.post.getAll();
 
-api.client.update({
-  id: 123,
-  isPrimary: true,
-  payload: { age: 18, hobby: 'Java' },
-})
+  await api.post.create<Post, Omit<Post, "id">>({
+    payload: {
+      title: "foo",
+      body: "bar",
+      userId: 1,
+    },
+  });
 
-// AXIOS put on, http://localhost:8000/product/primary/pants?subproducts=true with {"size":"S","color":"black"}
-api.product.add.primary({
-  hasSubproducts: true,
-  productType: 'pants',
-  payload: { size: 'S', color: 'black' },
-  config: { headers: { 'X-Requested-With': 'XMLHttpRequest' } },
-})
+  await api.post.update<Post, Post>({
+    postId: 1,
+    payload: {
+      id: 1,
+      title: "foo",
+      body: "bar",
+      userId: 1,
+    },
+  });
+
+  await api.post.patch<Post, Partial<Post>>({
+    postId: 1,
+    payload: {
+      title: "foo",
+    },
+  });
+
+  await api.post.delete({
+    postId: 1,
+  });
+
+  await api.post.filter({
+    userId: 2,
+  });
+
+  await api.todos.getById({
+    todoId: 1,
+  });
+})();
