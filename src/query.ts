@@ -1,19 +1,29 @@
 import { EMethod, TQuery } from './types'
 const TYPE = '__query__' as const
 
+const combine = (templates: TemplateStringsArray, inserts: unknown[]) => {
+  return templates.reduce((acc, left, index) => {
+    const insert = inserts[index]
+    const right = ['undefined', 'function'].includes(typeof insert)
+      ? ''
+      : insert
+    return `${acc}${left}${right}`
+  }, '')
+}
+
 const query = (
   method: EMethod,
-  [template]: TemplateStringsArray,
-  ...handlers: Function[]
+  templates: TemplateStringsArray,
+  ...inserts: unknown[]
 ): TQuery => {
-  const [url] = template.split(/\s+/)
+  const [url] = combine(templates, inserts).split(/\s|=>/)
 
   return {
     type: TYPE,
     hasPayload: [EMethod.POST, EMethod.PUT, EMethod.PATCH].includes(method),
     method,
     url,
-    handlers: handlers.filter((f) => typeof f === 'function'),
+    handlers: inserts.filter((f) => typeof f === 'function') as Function[],
   }
 }
 
