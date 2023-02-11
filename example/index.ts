@@ -1,6 +1,6 @@
 import axios from "axios";
 import { IRootService } from "./types";
-import { ApiBuilder } from "api-scaffolding";
+import { ApiBuilder } from "../src/index";
 import { schema } from "./schema";
 
 const domains = {
@@ -19,11 +19,11 @@ interface Post {
 }
 
 (async () => {
-  await api.post.getById({ postId: 1 });
+  await api.Post.getById({ postId: 1 });
 
-  await api.post.getAll();
+  await api.Post.getAll();
 
-  await api.post.create<Post, Omit<Post, "id">>({
+  await api.Post.create<Post, Omit<Post, "id">>({
     payload: {
       title: "foo",
       body: "bar",
@@ -31,7 +31,7 @@ interface Post {
     },
   });
 
-  await api.post.update<Post, Post>({
+  await api.Post.update<Post, Post>({
     postId: 1,
     payload: {
       id: 1,
@@ -41,22 +41,22 @@ interface Post {
     },
   });
 
-  await api.post.patch<Post, Partial<Post>>({
+  await api.Post.patch<Post, Partial<Post>>({
     postId: 1,
     payload: {
       title: "foo",
     },
   });
 
-  await api.post.delete({
+  await api.Post.delete({
     postId: 1,
   });
 
-  await api.post.filter({
+  await api.Post.filter({
     userId: 2,
   });
 
-  await api.todos.getById({
+  await api.Todo.getById({
     todoId: 1,
   });
 })();

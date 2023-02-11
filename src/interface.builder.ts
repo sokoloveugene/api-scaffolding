@@ -3,30 +3,35 @@ import { capitalize } from './helpers'
 import { ApiSchema, TQuery } from './types'
 
 export class ApiInterfaceBuilder {
-  generatedInterfaces: Set<string>
+  usedInterfaceNames: string[]
+  generatedInterfaces: string[]
 
   constructor(schema: ApiSchema) {
-    this.generatedInterfaces = new Set()
+    this.usedInterfaceNames = []
+    this.generatedInterfaces = []
     this.getInterface('RootService', schema)
   }
 
-  getInterface(name: string, schema: ApiSchema) {
+  getInterface(name: string, schema: ApiSchema, interfaceName?: string) {
     const parts = []
 
-    parts.push(`export interface ${this.getInterfaceName(name)} {`)
+    parts.push(
+      `export interface ${interfaceName ?? this.getInterfaceName(name)} {`
+    )
 
     for (const [field, value] of Object.entries(schema)) {
       if (isQuery(value)) {
         const generic = `<R${value.hasPayload ? ', P = unknown' : ''}>`
         parts.push(`${field}${generic}${this.getMethod(value)}`)
       } else {
-        parts.push(`${field}: ${this.getInterfaceName(field)},`)
-        this.getInterface(field, value)
+        const interfaceName = this.getInterfaceName(field)
+        parts.push(`${field}: ${interfaceName},`)
+        this.getInterface(field, value, interfaceName)
       }
     }
 
     parts.push('}')
-    this.generatedInterfaces.add(parts.join('\n'))
+    this.generatedInterfaces.push(parts.join('\n'))
   }
 
   getMethod(query: TQuery) {
@@ -58,12 +63,26 @@ export class ApiInterfaceBuilder {
     )
   }
 
+  normalizeInterfaceName(serviceName: string) {
+    const capitalized = capitalize(serviceName)
+    const serviceEnded = capitalized.endsWith('Service')
+      ? capitalized
+      : `${capitalized}Service`
+    return `I${serviceEnded}`
+  }
+
   getInterfaceName(serviceName: string) {
-    const base = `I${capitalize(serviceName)}`
-    return base.endsWith('Service') ? base : `${base}Service`
+    const base = this.normalizeInterfaceName(serviceName)
+    let i = 1
+    while (this.usedInterfaceNames.includes(base + i.toString())) {
+      i++
+    }
+    const interfaceName = base + i.toString()
+    this.usedInterfaceNames.push(interfaceName)
+    return interfaceName
   }
 
   get serialized() {
-    return [...this.generatedInterfaces].join('\n\n')
+    return this.generatedInterfaces.join('\n\n')
   }
 }
