@@ -7,7 +7,7 @@ const Fn = {
 }
 
 export const schema = {
-  Post: {
+  Posts: {
     get: {
       byId: GET`{{api}}/posts/{{postId:number}} => ${Fn.data} ${Fn.log}`,
       all: GET`{{api}}/posts => ${Fn.data} ${Fn.log}`,
@@ -18,12 +18,12 @@ export const schema = {
     delete: DELETE`{{api}}/posts/{{postId:number}} => ${Fn.data} ${Fn.log}`,
     filter: GET`{{api}}/posts?userId={{userId:number}} => ${Fn.data} ${Fn.log}`,
   },
-  Todo: {
+  Todos: {
     get: {
       byId: GET`{{api}}/todos/{{todoId:number}} => ${Fn.data} ${Fn.log}`,
     },
   },
-  Relationship: {
+  Relationships: {
     get: {
       byId: GET`{{api}}/relationships/{{todoId:number}} => ${Fn.data} ${Fn.log}`,
     },

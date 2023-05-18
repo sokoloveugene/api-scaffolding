@@ -3,7 +3,7 @@ export interface IGetService1 {
   all<R>(params?: { config?: any }): Promise<R>
 }
 
-export interface IPostService1 {
+export interface IPostsService1 {
   get: IGetService1
   create<R, P = unknown>(params?: { payload?: P; config?: any }): Promise<R>
   update<R, P = unknown>(params: {
@@ -24,7 +24,7 @@ export interface IGetService2 {
   byId<R>(params: { todoId: number; config?: any }): Promise<R>
 }
 
-export interface ITodoService1 {
+export interface ITodosService1 {
   get: IGetService2
 }
 
@@ -32,12 +32,12 @@ export interface IGetService3 {
   byId<R>(params: { todoId: number; config?: any }): Promise<R>
 }
 
-export interface IRelationshipService1 {
+export interface IRelationshipsService1 {
   get: IGetService3
 }
 
 export interface IRootService1 {
-  Post: IPostService1
-  Todo: ITodoService1
-  Relationship: IRelationshipService1
+  Posts: IPostsService1
+  Todos: ITodosService1
+  Relationships: IRelationshipsService1
 }

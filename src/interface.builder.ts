@@ -11,7 +11,6 @@ export class ApiInterfaceBuilder {
     this.generatedInterfaces = []
     this.getInterface('RootService', schema)
   }
-
   getInterface(name: string, schema: ApiSchema, interfaceName?: string) {
     const parts = []
 
