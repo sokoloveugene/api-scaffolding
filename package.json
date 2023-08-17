@@ -1,6 +1,6 @@
 {
   "name": "api-scaffolding",
-  "version": "0.0.11",
+  "version": "0.1.1",
   "description": "Generate API functions with types using schema",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,14 +9,14 @@
     "dist"
   ],
   "bin": {
-    "api-scaffolding-types": "dist/generate.js"
+    "api-scaffolding-types": "src/generate.js"
   },
   "scripts": {
-    "build:script": "esbuild src/generate.ts --bundle --outfile=dist/generate.js --platform=node --minify",
-    "build:lib": "esbuild src/index.ts --bundle --outfile=dist/index.js --platform=node --minify",
-    "build": "npm run build:script && npm run build:lib",
+    "build": "esbuild src/index.ts --bundle --outfile=dist/index.js --platform=node --minify",
     "postbuild": "tsc --emitDeclarationOnly",
-    "test": "jest"
+    "test": "jest",
+    "example": "node src/generate.js --input=example/schema.ts --output=example/types.ts --name=API",
+    "example:watch": "node src/generate.js --input=example/schema.ts --output=example/types.ts --watch --name=API"
   },
   "author": "Sokolov Yevhenii",
   "devDependencies": {

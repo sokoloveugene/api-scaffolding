@@ -36,52 +36,80 @@ export const schema = {
 
 Make sure schema.ts file has named export of schema
 
-Types can be generated once
+Example:
 
 ```bash
-npx api-scaffolding-types -i schema.ts -o types.ts
+npx api-scaffolding-types -i=example/schema.ts -o=example/types.ts -n=API -w
 ```
 
-Or generate in watch mode
+---
+
+Specify path to schema file
 
 ```bash
-npx api-scaffolding-types -i schema.ts -o types.ts --watch
+-i=example/schema.ts
+--input=example/schema.ts
 ```
+
+---
+
+Specify path to write generated types
+
+```bash
+-o=example/types.ts
+--output=example/types.ts
+```
+
+---
+
+Specify root type name (optional)
+
+```bash
+-n=API
+--name=API
+```
+
+---
+
+Start generation in watch mode (optional)
+
+```bash
+-w
+--watch
+```
+
+---
 
 #### Check generated types
 
-It will automatically format file if prettier is installed
-
-```bash
-npm install prettier -D
-```
+It will automatically generate TS types
 
 ```typescript
-export interface IPostService {
-  getById<R>(params: { postId: number; config?: any }): Promise<R>
-  getAll<R>(params?: { config?: any }): Promise<R>
-  create<R, P = unknown>(params?: { payload?: P; config?: any }): Promise<R>
-  update<R, P = unknown>(params: {
+export interface API_post {
+  getById: <R>(params: { postId: number; config?: any }) => Promise<R>
+  getAll: <R>(params?: { config?: any }) => Promise<R>
+  create: <R, P = unknown>(params?: { config?: any; payload: P }) => Promise<R>
+  update: <R, P = unknown>(params: {
     postId: number
-    payload?: P
     config?: any
-  }): Promise<R>
-  patch<R, P = unknown>(params: {
+    payload: P
+  }) => Promise<R>
+  patch: <R, P = unknown>(params: {
     postId: number
-    payload?: P
     config?: any
-  }): Promise<R>
-  delete<R>(params: { postId: number; config?: any }): Promise<R>
-  filter<R>(params: { userId: number; config?: any }): Promise<R>
+    payload: P
+  }) => Promise<R>
+  delete: <R>(params: { postId: number; config?: any }) => Promise<R>
+  filter: <R>(params: { userId: number; config?: any }) => Promise<R>
 }
 
-export interface ITodosService {
-  getById<R>(params: { todoId: number; config?: any }): Promise<R>
+export interface API_todos {
+  getById: <R>(params: { todoId: number; config?: any }) => Promise<R>
 }
 
-export interface IRootService {
-  post: IPostService
-  todos: ITodosService
+export interface API {
+  post: API_post
+  todos: API_todos
 }
 ```
 
@@ -90,8 +118,8 @@ export interface IRootService {
 ```typescript
 // index.ts
 import axios from 'axios'
-import { IRootService } from './types'
 import { ApiBuilder } from 'api-scaffolding'
+import { API } from './types'
 import { schema } from './schema'
 
 const domains = {
@@ -100,7 +128,7 @@ const domains = {
 
 const api = ApiBuilder.setHttpClient(axios)
   .setDomains(domains)
-  .from<IRootService>(schema)
+  .from<API>(schema)
 
 interface Post {
   id: number
@@ -109,7 +137,7 @@ interface Post {
   userId: number
 }
 
-const example = async () => {
+;(async () => {
   await api.post.getById({ postId: 1 })
 
   await api.post.getAll()
@@ -147,16 +175,8 @@ const example = async () => {
     userId: 2,
   })
 
-  await api.todos.getById({
-    todoId: 1,
+  await api.post.getById({
+    postId: 1,
   })
-}
-
-example()
-```
-
-#### Test
-
-```bash
-npx ts-node index.ts
+})()
 ```

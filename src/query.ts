@@ -1,5 +1,4 @@
 import { EMethod, TQuery } from './types'
-const TYPE = '__query__' as const
 
 const combine = (templates: TemplateStringsArray, inserts: unknown[]) => {
   return templates.reduce((acc, left, index) => {
@@ -19,7 +18,9 @@ const query = (
   const [url] = combine(templates, inserts).split(/\s|=>/)
 
   return {
-    type: TYPE,
+    get isQuery() {
+      return true
+    },
     hasPayload: [EMethod.POST, EMethod.PUT, EMethod.PATCH].includes(method),
     method,
     url,
@@ -35,5 +36,5 @@ export const DELETE = query.bind(null, EMethod.DELETE)
 
 export const isQuery = (val: unknown): val is TQuery => {
   // @ts-ignore
-  return Boolean(val) && typeof val === 'object' && val['type'] === TYPE
+  return val?.isQuery
 }

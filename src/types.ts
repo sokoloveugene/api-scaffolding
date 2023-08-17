@@ -15,7 +15,7 @@ export interface IHttpClient<Config = unknown> {
 }
 
 export type TQuery = {
-  type: '__query__'
+  isQuery: boolean
   hasPayload: boolean
   method: EMethod
   url: string
