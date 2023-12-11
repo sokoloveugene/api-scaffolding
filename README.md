@@ -7,176 +7,105 @@ npm install api-scaffolding
 #### Create api schema
 
 ```typescript
-// schema.ts
-import { GET, DELETE, PATCH, POST, PUT } from 'api-scaffolding'
-import { AxiosResponse } from 'axios'
+import { Repository } from 'api-scaffolding'
 
-const Fn = {
-  data: (res: AxiosResponse) => res.data,
-  log: <T = any>(data: T): T => (console.log(data), data),
-}
-
-export const schema = {
-  post: {
-    getById: GET`{{api}}/posts/{{postId:number}} => ${Fn.data} ${Fn.log}`,
-    getAll: GET`{{api}}/posts => ${Fn.data} ${Fn.log}`,
-    create: POST`{{api}}/posts => ${Fn.data} ${Fn.log}`,
-    update: PUT`{{api}}/posts/{{postId:number}} => ${Fn.data} ${Fn.log}`,
-    patch: PATCH`{{api}}/posts/{{postId:number}} => ${Fn.data} ${Fn.log}`,
-    delete: DELETE`{{api}}/posts/{{postId:number}} => ${Fn.data} ${Fn.log}`,
-    filter: GET`{{api}}/posts?userId={{userId:number}} => ${Fn.data} ${Fn.log}`,
-  },
-  todos: {
-    getById: GET`{{api}}/todos/{{todoId:number}} => ${Fn.data} ${Fn.log}`,
-  },
-}
-```
-
-#### Generate types
-
-Make sure schema.ts file has named export of schema
-
-Example:
-
-```bash
-npx api-scaffolding-types -i=example/schema.ts -o=example/types.ts -n=API -w
-```
-
----
-
-Specify path to schema file
-
-```bash
--i=example/schema.ts
---input=example/schema.ts
-```
-
----
-
-Specify path to write generated types
-
-```bash
--o=example/types.ts
---output=example/types.ts
-```
-
----
-
-Specify root type name (optional)
-
-```bash
--n=API
---name=API
-```
-
----
-
-Start generation in watch mode (optional)
-
-```bash
--w
---watch
-```
-
----
-
-#### Check generated types
-
-It will automatically generate TS types
-
-```typescript
-export interface API_post {
-  getById: <R>(params: { postId: number; config?: any }) => Promise<R>
-  getAll: <R>(params?: { config?: any }) => Promise<R>
-  create: <R, P = unknown>(params?: { config?: any; payload: P }) => Promise<R>
-  update: <R, P = unknown>(params: {
-    postId: number
-    config?: any
-    payload: P
-  }) => Promise<R>
-  patch: <R, P = unknown>(params: {
-    postId: number
-    config?: any
-    payload: P
-  }) => Promise<R>
-  delete: <R>(params: { postId: number; config?: any }) => Promise<R>
-  filter: <R>(params: { userId: number; config?: any }) => Promise<R>
-}
-
-export interface API_todos {
-  getById: <R>(params: { todoId: number; config?: any }) => Promise<R>
-}
-
-export interface API {
-  post: API_post
-  todos: API_todos
-}
-```
-
-#### Import schema and types to create api instance
-
-```typescript
-// index.ts
-import axios from 'axios'
-import { ApiBuilder } from 'api-scaffolding'
-import { API } from './types'
-import { schema } from './schema'
-
-const domains = {
-  api: 'https://jsonplaceholder.typicode.com',
-}
-
-const api = ApiBuilder.setHttpClient(axios)
-  .setDomains(domains)
-  .from<API>(schema)
+const repo = new Repository()
+  .setHandler((options) => {
+    return fetch(options.url).then((response) => response.json())
+  })
+  .setDomains({
+    api: 'https://jsonplaceholder.typicode.com',
+  })
 
 interface Post {
+  userId: number
   id: number
   title: string
   body: string
-  userId: number
 }
 
-;(async () => {
-  await api.post.getById({ postId: 1 })
+interface Todo {
+  userId: number
+  id: number
+  title: string
+  completed: boolean
+}
 
-  await api.post.getAll()
+/**
+ * Call function with optional generics
+ * repo.use<ResponseType, PayloadType, ConfigType>
+ * with desired method (can be any string)
+ * then call returned function with desired URL
+ * dynamic parameters start with ":" Example :userId
+ * these parameters will be automatically required on usage
+ */
 
-  await api.post.create<Post, Omit<Post, 'id'>>({
-    payload: {
-      title: 'foo',
-      body: 'bar',
-      userId: 1,
-    },
-  })
+const api = {
+  postModel: {
+    findOne: repo.use<Post>('GET')('{{api}}/posts/:postId'),
+    findAll: repo.use<Post[]>('GET')('{{api}}/posts'),
+    create: repo.use<Post, Omit<Post, 'id'>>('POST')('{{api}}/posts'),
+    update: repo.use<Post, Post>('PUT')('{{api}}/posts/:postId'),
+    patch: repo.use<Post, Partial<Post>>('PATCH')('{{api}}/posts/:postId'),
+    delete: repo.use('DELETE')('{{api}}/posts/:postId'),
+    filter: repo.use<Post[]>('GET')('{{api}}/posts?userId=:userId'),
+  },
 
-  await api.post.update<Post, Post>({
-    postId: 1,
-    payload: {
-      id: 1,
-      title: 'foo',
-      body: 'bar',
-      userId: 1,
-    },
-  })
+  todoModel: {
+    findOne: repo.use<Todo>('GET')('{{api}}/todos/:todoId'),
+  },
 
-  await api.post.patch<Post, Partial<Post>>({
-    postId: 1,
-    payload: {
-      title: 'foo',
-    },
-  })
+  use: <Response, Payload = never, Config = never>(
+    ...args: Parameters<typeof repo.use>
+  ) => repo.use<Response, Payload, Config>(...args),
+}
+```
 
-  await api.post.delete({
-    postId: 1,
-  })
+#### Usage
 
-  await api.post.filter({
-    userId: 2,
-  })
+```typescript
+/* const post: Post */
+const post = await api.postModel.findOne({ postId: '1' })
 
-  await api.post.getById({
-    postId: 1,
-  })
-})()
+/* const posts: Post[] */
+const posts = await api.postModel.findAll({})
+
+await api.postModel.create({
+  payload: {
+    title: 'foo',
+    body: 'bar',
+    userId: 1,
+  },
+})
+
+await api.postModel.update({
+  postId: '1',
+  payload: {
+    id: 1,
+    title: 'foo',
+    body: 'bar',
+    userId: 1,
+  },
+})
+
+await api.postModel.patch({
+  postId: '1',
+  payload: {
+    title: 'foo',
+  },
+})
+
+await api.postModel.delete({
+  postId: '1',
+})
+
+await api.postModel.filter({
+  userId: '2',
+})
+
+await api.todoModel.findOne({
+  todoId: '4',
+})
+
+await api.use('DELETE')('{{api}}/todos/:todoId')({ todoId: '1' })
 ```

@@ -1,57 +1,86 @@
-import axios from 'axios'
-import MockAdapter from 'axios-mock-adapter'
-import { GET } from '../src/query'
-import { ApiBuilder } from '../src/api.builder'
+import { Repository } from '../src/index'
 
-const Fn = {
-  data: (response) => response.data,
-  uppercase: (str) => str.toUpperCase(),
-}
+const repo = new Repository()
+  /* Define implementation for making request */
+  .setHandler((options) => {
+    if (options.url === 'https://test.com/posts' && options.method === 'GET') {
+      return Promise.resolve(['post1', 'post2'])
+    }
 
-export const schema = {
-  Post: {
-    getAll: GET`{{api}}/posts => ${Fn.data}`,
-    getById: GET`{{api}}/posts/{{postId:number}} => ${Fn.data} ${Fn.uppercase}`,
+    if (options.url === 'https://test.com/posts/1') {
+      return Promise.resolve('post1')
+    }
+
+    return Promise.resolve(options)
+  })
+  /* Define shortcuts. Example of usage "{{api}}/todos/:todoId" */
+  .setDomains({
+    api: 'https://test.com',
+  })
+
+const api = {
+  postModel: {
+    findOne: repo.use('GET')('{{api}}/posts/:postId'),
+    findAll: repo.use('GET')('{{api}}/posts'),
+    create: repo.use('POST')('{{api}}/posts'),
+    update: repo.use('PUT')('{{api}}/posts/:postId'),
+    patch: repo.use('PATCH')('{{api}}/posts/:postId'),
+    delete: repo.use('DELETE')('{{api}}/posts/:postId'),
+    filter: repo.use('GET')('{{api}}/posts?userId=:userId'),
   },
-  Todo: {
-    getById: GET`{{api}}/todos/{{todoId:number}} => ${Fn.data}`,
+
+  todoModel: {
+    findOne: repo.use('GET')('{{api}}/todos/:todoId'),
+  },
+
+  use: (...args) => {
+    return repo.use(...args)
   },
 }
 
 describe('Generated api', () => {
-  let mock
-  let api
-
-  beforeAll(() => {
-    const domains = {
-      api: 'http://api.com',
-    }
-    api = ApiBuilder.setHttpClient(axios).setDomains(domains).from(schema)
-  })
-
-  beforeEach(() => {
-    mock = new MockAdapter(axios)
-  })
-
-  it('returns data on GET reqest', async () => {
-    const URL = 'http://api.com/posts'
-    const data = ['post1', 'post2']
-    mock.onGet(URL).reply(200, data)
-
-    const response = await api.Post.getAll()
-
-    expect(mock.history.get[0].url).toBe(URL)
-    expect(response).toEqual(data)
+  it('returns data on GET request', async () => {
+    const response = await api.postModel.findAll({})
+    expect(response).toEqual(['post1', 'post2'])
   })
 
   it('returns data on GET request with parameter for URL', async () => {
-    const URL = 'http://api.com/posts/1'
-    const data = 'post1'
-    mock.onGet(URL).reply(200, data)
+    const response = await api.postModel.findOne({ postId: '1' })
+    expect(response).toEqual('post1')
+  })
 
-    const response = await api.Post.getById({ postId: 1 })
+  it('returns data on GET request with parameter for URL', async () => {
+    const response = await api.postModel.findOne({ postId: '2' })
+    expect(response).toEqual({
+      config: undefined,
+      method: 'GET',
+      payload: undefined,
+      url: 'https://test.com/posts/2',
+    })
+  })
 
-    expect(mock.history.get[0].url).toBe(URL)
-    expect(response).toEqual(data.toUpperCase())
+  it('returns data on GET request with parameter for URL', async () => {
+    const response = await api.postModel.create({
+      config: {
+        token: '#123',
+      },
+      payload: {
+        title: 'foo',
+        body: 'bar',
+        userId: 1,
+      },
+    })
+    expect(response).toEqual({
+      config: {
+        token: '#123',
+      },
+      method: 'POST',
+      payload: {
+        title: 'foo',
+        body: 'bar',
+        userId: 1,
+      },
+      url: 'https://test.com/posts',
+    })
   })
 })
